@@ -1,0 +1,55 @@
+<section>
+  <form
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayoutGap="10px"
+    #f="ngForm"
+    (ngSubmit)="onSubmit(f)"
+  >
+    <mat-form-field>
+      <input
+        type="email"
+        matInput
+        placeholder="Email"
+        ngModel
+        name="email"
+        required
+        email
+        #usernameInput="ngModel"
+      />
+      <mat-error
+        *ngIf="usernameInput.hasError('required') && usernameInput.touched"
+        >Email Required</mat-error
+      >
+      <mat-error
+        *ngIf="usernameInput.hasError('email') && usernameInput.touched"
+        >Email Invalid</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field>
+      <input
+        type="password"
+        matInput
+        placeholder="Password"
+        ngModel
+        name="password"
+        required
+        #passwordInput="ngModel"
+      />
+      <mat-error
+        *ngIf="passwordInput.hasError('required') && passwordInput.touched"
+        >Password Required</mat-error
+      >
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="f.invalid"
+    >
+      Submit
+    </button>
+  </form>
+</section>
