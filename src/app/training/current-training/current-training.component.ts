@@ -24,6 +24,7 @@ export class CurrentTrainingComponent implements OnInit {
 
   startOrResumeTimer() {
     const step = this.trainingService.getRunningExercise().duration * 10;
+
     this.timer = setInterval(() => {
       this.progress = this.progress + 1;
       if (this.progress >= 100) {
