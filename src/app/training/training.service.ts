@@ -1,3 +1,4 @@
+import { AuthService } from "./../auth/auth.service";
 import { UiService } from "./../shared/ui.service";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Exercise } from "./exercise.model";
@@ -62,36 +63,49 @@ export class TrainingService {
     return { ...this.runningExercise };
   }
 
-  completeExercise() {
+  completeExercise(uId) {
     this.AddToDataBase({
       ...this.runningExercise,
       date: new Date(),
-      state: "completed"
+      state: "completed",
+      uId: uId
     });
     this.runningExercise = null;
     this.exerciseChanged.next(null);
   }
 
-  cancelExercise(progress: number) {
+  cancelExercise(progress: number, uId) {
     this.AddToDataBase({
       ...this.runningExercise,
       duration: this.runningExercise.duration * (progress / 100),
       calories: this.runningExercise.calories * (progress / 100),
       date: new Date(),
-      state: "cancelled"
+      state: "cancelled",
+      uId: uId
     });
     this.runningExercise = null;
     this.exerciseChanged.next(null);
   }
 
-  fetchCompletedOrCancelledExercises() {
+  fetchCompletedOrCancelledExercises(uId) {
     this.fbsubs.push(
       this.db
         .collection("finishedExercises")
         .valueChanges()
+        .pipe(
+          map((exercises: Exercise[]) => {
+            var ex = [
+              ...exercises.filter(e => {
+                if (e.uId == uId) return e;
+              })
+            ];
+
+            return ex;
+          })
+        )
+
         .subscribe((exercises: Exercise[]) => {
           this.finishedExercisesChanged.next(exercises);
-          console.log(exercises);
         })
     );
   }

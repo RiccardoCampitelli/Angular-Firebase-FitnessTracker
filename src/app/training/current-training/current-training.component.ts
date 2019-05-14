@@ -1,8 +1,10 @@
+import { AuthService } from "./../../auth/auth.service";
 import { Exercise } from "./../exercise.model";
 import { StopTrainingComponent } from "./stop-training.component";
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material";
 import { TrainingService } from "../training.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-current-training",
@@ -13,13 +15,16 @@ export class CurrentTrainingComponent implements OnInit {
   exercise: Exercise;
   progress = 0;
   timer: number;
+  currentUserId: string;
   constructor(
     private dialog: MatDialog,
-    private trainingService: TrainingService
+    private trainingService: TrainingService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.startOrResumeTimer();
+    this.authService.getUserId().subscribe(u => (this.currentUserId = u.uid));
   }
 
   startOrResumeTimer() {
@@ -28,7 +33,7 @@ export class CurrentTrainingComponent implements OnInit {
     this.timer = setInterval(() => {
       this.progress = this.progress + 1;
       if (this.progress >= 100) {
-        this.trainingService.completeExercise();
+        this.trainingService.completeExercise(this.currentUserId);
         clearInterval(this.timer);
       }
     }, step);
@@ -42,7 +47,7 @@ export class CurrentTrainingComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.trainingService.cancelExercise(this.progress);
+        this.trainingService.cancelExercise(this.progress, this.currentUserId);
       } else {
         this.startOrResumeTimer();
       }

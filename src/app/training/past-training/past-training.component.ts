@@ -9,6 +9,7 @@ import {
 } from "@angular/core";
 import { TrainingService } from "../training.service";
 import { MatTableDataSource, MatSort, MatPaginator } from "@angular/material";
+import { AuthService } from "src/app/auth/auth.service";
 
 @Component({
   selector: "app-past-training",
@@ -19,10 +20,14 @@ export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns = ["date", "name", "duration", "calories", "state"];
   dataSource = new MatTableDataSource<Exercise>();
   private exChangedSubscription: Subscription;
+  private currentUid: string;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) page: MatPaginator;
-  constructor(private trainingService: TrainingService) {}
+  constructor(
+    private trainingService: TrainingService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
     this.exChangedSubscription = this.trainingService.finishedExercisesChanged.subscribe(
@@ -30,7 +35,10 @@ export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dataSource.data = exercises;
       }
     );
-    this.trainingService.fetchCompletedOrCancelledExercises();
+    this.auth.getUserId().subscribe(u => {
+      if (u != null)
+        this.trainingService.fetchCompletedOrCancelledExercises(u.uid);
+    });
   }
 
   ngAfterViewInit() {

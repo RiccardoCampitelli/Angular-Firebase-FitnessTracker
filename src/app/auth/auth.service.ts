@@ -68,4 +68,8 @@ export class AuthService {
   isAuth() {
     return this.isAuthenticated;
   }
+
+  getUserId() {
+    return this.afAuth.user;
+  }
 }
